@@ -1,10 +1,16 @@
+using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.Xml.Linq;
+using Test_task_1.Model;
+using Test_task_1.Util;
 
 namespace Test_task_1
 {
     public partial class Form1 : Form
     {
+        
         public string dirPath = Path.Combine(Environment.CurrentDirectory, "GeneratedFiles");
+        AppContext db = new AppContext();
         public Form1()
         {
             InitializeComponent();
@@ -198,6 +204,86 @@ namespace Test_task_1
                 progressMergedTextBox.AppendText($"Error during merging: {ex.Message}" + Environment.NewLine);
                 progressMergedTextBox.ScrollToCaret();
             }
+        }
+
+        private void databaseTransferButton_Click(object sender, EventArgs e)
+        {
+            databaseTransferedInfoTextBox.Clear();
+            ImportFiles();
+
+        }
+
+        private void ImportFiles()
+        {
+            if (!Directory.Exists(dirPath))
+            {
+                progressTextBox.AppendText("Directory does not exist." + Environment.NewLine);
+                return;
+            }
+            //получение файлов в виде массива
+            string[] files = Directory.GetFiles(dirPath);
+            //получение суммарного количества строк файла
+            int totalRows = files.Sum(file => CountLinesInFile(file));
+
+            //счетчик строк, которые были импортированы
+            int importedRows = 0;
+            foreach (string file in files)
+            {
+                importedRows += ImportFile(file);
+                //остаток строк
+                int remainingRows = totalRows - importedRows;
+                databaseTransferedInfoTextBox.AppendText($"Imported {importedRows} rows. {remainingRows} rows remaining." + Environment.NewLine);
+            }
+
+            databaseTransferedInfoTextBox.AppendText("Import completed." + Environment.NewLine);
+        }
+
+        private int CountLinesInFile(string filePath)
+        {
+            int lineCount = 0;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                while (reader.ReadLine() != null)
+                {
+                    lineCount++;
+                }
+            }
+            return lineCount;
+        }
+        private int ImportFile(string filePath)
+        {
+            int rowCount = 0;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    //разделение строки из файла на части
+                    string[] parts = line.Split('|');
+                    if (parts.Length != 5)
+                    {
+                        // обработка некорректного формата
+                        continue;
+                    }
+
+                    //создание сущности
+                    var data = new FileEntity
+                    {
+                        Date = DateTime.Parse(parts[0]),
+                        LatinChars = parts[1],
+                        CyrillicChars = parts[2],
+                        EvenNumber = int.Parse(parts[3]),
+                        FloatNumber = decimal.Parse(parts[4])
+                    };
+                    //добавление в таблицу Files
+                    db.Files.Add(data);
+                    rowCount++;
+                }
+
+                db.SaveChanges(); //сохранение изменений
+                
+            }
+            return rowCount;
         }
     }
 }

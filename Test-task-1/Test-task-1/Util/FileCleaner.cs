@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test_task_1
+namespace Test_task_1.Util
 {
     public class FileCleaner
     {
@@ -12,7 +12,7 @@ namespace Test_task_1
 
         public FileCleaner(string path)
         {
-            this.directoryPath = path;
+            directoryPath = path;
         }
         public void DeleteAllFiles()
         {

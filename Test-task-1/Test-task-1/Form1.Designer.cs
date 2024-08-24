@@ -36,8 +36,8 @@
             searchTextBox = new TextBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
-            textBox2 = new TextBox();
-            button3 = new Button();
+            databaseTransferedInfoTextBox = new TextBox();
+            databaseTransferButton = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
@@ -117,8 +117,8 @@
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(textBox2);
-            groupBox2.Controls.Add(button3);
+            groupBox2.Controls.Add(databaseTransferedInfoTextBox);
+            groupBox2.Controls.Add(databaseTransferButton);
             groupBox2.Location = new Point(604, 12);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(348, 364);
@@ -126,23 +126,24 @@
             groupBox2.TabStop = false;
             groupBox2.Text = "Adding to database";
             // 
-            // textBox2
+            // databaseTransferedInfoTextBox
             // 
-            textBox2.Location = new Point(9, 78);
-            textBox2.Multiline = true;
-            textBox2.Name = "textBox2";
-            textBox2.ScrollBars = ScrollBars.Both;
-            textBox2.Size = new Size(333, 273);
-            textBox2.TabIndex = 1;
+            databaseTransferedInfoTextBox.Location = new Point(9, 78);
+            databaseTransferedInfoTextBox.Multiline = true;
+            databaseTransferedInfoTextBox.Name = "databaseTransferedInfoTextBox";
+            databaseTransferedInfoTextBox.ScrollBars = ScrollBars.Both;
+            databaseTransferedInfoTextBox.Size = new Size(333, 273);
+            databaseTransferedInfoTextBox.TabIndex = 1;
             // 
-            // button3
+            // databaseTransferButton
             // 
-            button3.Location = new Point(9, 26);
-            button3.Name = "button3";
-            button3.Size = new Size(333, 46);
-            button3.TabIndex = 0;
-            button3.Text = "Generate files";
-            button3.UseVisualStyleBackColor = true;
+            databaseTransferButton.Location = new Point(9, 26);
+            databaseTransferButton.Name = "databaseTransferButton";
+            databaseTransferButton.Size = new Size(333, 46);
+            databaseTransferButton.TabIndex = 0;
+            databaseTransferButton.Text = "Transfer to database";
+            databaseTransferButton.UseVisualStyleBackColor = true;
+            databaseTransferButton.Click += databaseTransferButton_Click;
             // 
             // Form1
             // 
@@ -170,7 +171,7 @@
         private TextBox searchTextBox;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
-        private TextBox textBox2;
-        private Button button3;
+        private TextBox databaseTransferedInfoTextBox;
+        private Button databaseTransferButton;
     }
 }

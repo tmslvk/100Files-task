@@ -7,17 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Test_task_1.Model;
 
-namespace Test_task_1.Context
+namespace Test_task_1
 {
-    public partial class ApplicationContext : DbContext
+    public partial class AppContext : DbContext
     {
-        public ApplicationContext()
+        public AppContext()
         {
         }
 
         public DbSet<FileEntity> Files { get; set; } = null!;
 
-        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+        public AppContext(DbContextOptions<AppContext> options)
             : base(options)
         {
             Database.EnsureCreated();
