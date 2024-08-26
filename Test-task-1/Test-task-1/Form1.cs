@@ -1,14 +1,17 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Text;
 using System.Xml.Linq;
 using Test_task_1.Model;
 using Test_task_1.Util;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Test_task_1
 {
     public partial class Form1 : Form
     {
-        
+
         public string dirPath = Path.Combine(Environment.CurrentDirectory, "GeneratedFiles");
         AppContext db = new AppContext();
         public Form1()
@@ -16,6 +19,15 @@ namespace Test_task_1
             InitializeComponent();
         }
 
+        /*Задание 1
+        Сгенерировать 100 текстовых файлов со следующей структурой, каждый из которых содержит 100 000 строк
+            случайная дата за последние 5 лет
+         || случайный набор 10 латинских символов
+         || случайный набор 10 русских символов
+         || случайное положительное четное целочисленное число в диапазоне от 1 до 100 000 000
+         || случайное положительное число с 8 знаками после запятой в диапазоне от 1 до 20*/
+
+        #region[Task1]
         private void GenerateFiles()
         {
             string path = Path.Combine(Environment.CurrentDirectory, "GeneratedFiles");
@@ -116,7 +128,10 @@ namespace Test_task_1
             progressTextBox.Clear();
             GenerateFiles();
         }
+#endregion
+
         //опциональная кнопка, для удаления всех файлов из папки "Generated files"
+        #region[OptionalDelete]
         private void deleteFilesButton_Click(object sender, EventArgs e)
         {
             try
@@ -133,6 +148,12 @@ namespace Test_task_1
             }
         }
 
+#endregion
+
+        //Задание 2
+        //Реализовать объединение файлов в один. При объединении должна быть возможность удалить из всех файлов строки с заданным
+        //сочетанием символов, например, «abc» с выводом информации о количестве удаленных строк
+        #region[Task2]
         private void mergeButton_Click(object sender, EventArgs e)
         {
             string searchText = searchTextBox.Text;
@@ -205,7 +226,12 @@ namespace Test_task_1
                 progressMergedTextBox.ScrollToCaret();
             }
         }
+#endregion
 
+        //Задание 3
+        //Создать процедуру импорта файлов с таким набором полей в таблицу в СУБД.
+        //При импорте должен выводится ход процесса (сколько строк импортировано, сколько осталось)
+        #region[Task3]
         private void databaseTransferButton_Click(object sender, EventArgs e)
         {
             databaseTransferedInfoTextBox.Clear();
@@ -222,13 +248,18 @@ namespace Test_task_1
             }
             //получение файлов в виде массива
             string[] files = Directory.GetFiles(dirPath);
+            databaseTransferedInfoTextBox.AppendText("Retrieving files" + Environment.NewLine);
             //получение суммарного количества строк файла
-            int totalRows = files.Sum(file => CountLinesInFile(file));
+            int totalRows = files
+                .Where(file => !Path.GetFileName(file).Equals("MergedFile.txt", StringComparison.OrdinalIgnoreCase))
+                .Sum(file => CountLinesInFile(file));
+            databaseTransferedInfoTextBox.AppendText("Retrieving a sum of a strings!" + Environment.NewLine);
 
             //счетчик строк, которые были импортированы
             int importedRows = 0;
             foreach (string file in files)
             {
+                if (Path.GetFileName(file).Equals("MergedFile.txt", StringComparison.OrdinalIgnoreCase)) continue;
                 importedRows += ImportFile(file);
                 //остаток строк
                 int remainingRows = totalRows - importedRows;
@@ -260,7 +291,9 @@ namespace Test_task_1
                 {
                     //разделение строки из файла на части
                     string[] parts = line.Split('|');
-                    if (parts.Length != 5)
+
+                    string[] cleanedArray = parts.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                    if (cleanedArray.Length != 5)
                     {
                         // обработка некорректного формата
                         continue;
@@ -269,11 +302,11 @@ namespace Test_task_1
                     //создание сущности
                     var data = new FileEntity
                     {
-                        Date = DateTime.Parse(parts[0]),
-                        LatinChars = parts[1],
-                        CyrillicChars = parts[2],
-                        EvenNumber = int.Parse(parts[3]),
-                        FloatNumber = decimal.Parse(parts[4])
+                        Date = DateTime.Parse(cleanedArray[0]),
+                        LatinChars = cleanedArray[1],
+                        CyrillicChars = cleanedArray[2],
+                        EvenNumber = int.Parse(cleanedArray[3]),
+                        FloatNumber = decimal.Parse(cleanedArray[4])
                     };
                     //добавление в таблицу Files
                     db.Files.Add(data);
@@ -281,9 +314,52 @@ namespace Test_task_1
                 }
 
                 db.SaveChanges(); //сохранение изменений
-                
+
             }
             return rowCount;
         }
+#endregion
+
+        //Задание 4
+        //Реализовать хранимую процедуру в БД (или скрипт с внешним sql-запросом),
+        //который считает сумму всех целых чисел и медиану всех дробных чисел
+        #region[Task4]
+        private void calculateSumNMedian_Click(object sender, EventArgs e)
+        {
+            calculationResultTextBox.Clear();
+            CalculateSumAndMedian();
+        }
+
+        private void CalculateSumAndMedian()
+        {
+            var connectionString = "Server=DESKTOP-1D3P714\\SQLEXPRESS;Database=HundredFiles;Trusted_Connection=True;MultipleActiveResultSets=true;";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand("CalculateSumAndMedian", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var sumEvenNumbers = reader.GetInt64(reader.GetOrdinal("SumEvenNumbers"));
+                            var medianFloatNumber = reader.IsDBNull(reader.GetOrdinal("MedianFloatNumber"))
+                                ? (decimal?)null
+                                : reader.GetDecimal(reader.GetOrdinal("MedianFloatNumber"));
+
+                            // Отображаем результаты в текстовом поле
+                            calculationResultTextBox.AppendText($"Sum of Even Numbers: {sumEvenNumbers}" + Environment.NewLine);
+                            calculationResultTextBox.AppendText($"Median of Float Numbers: {(medianFloatNumber.HasValue ? medianFloatNumber.Value.ToString() : "N/A")}" + Environment.NewLine);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
     }
 }

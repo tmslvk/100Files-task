@@ -38,6 +38,8 @@
             groupBox2 = new GroupBox();
             databaseTransferedInfoTextBox = new TextBox();
             databaseTransferButton = new Button();
+            calculationResultTextBox = new TextBox();
+            calculateSumNMedian = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
@@ -145,11 +147,34 @@
             databaseTransferButton.UseVisualStyleBackColor = true;
             databaseTransferButton.Click += databaseTransferButton_Click;
             // 
+            // calculationResultTextBox
+            // 
+            calculationResultTextBox.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            calculationResultTextBox.Location = new Point(302, 382);
+            calculationResultTextBox.Multiline = true;
+            calculationResultTextBox.Name = "calculationResultTextBox";
+            calculationResultTextBox.ScrollBars = ScrollBars.Both;
+            calculationResultTextBox.Size = new Size(644, 121);
+            calculationResultTextBox.TabIndex = 10;
+            // 
+            // calculateSumNMedian
+            // 
+            calculateSumNMedian.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            calculateSumNMedian.Location = new Point(21, 382);
+            calculateSumNMedian.Name = "calculateSumNMedian";
+            calculateSumNMedian.Size = new Size(275, 121);
+            calculateSumNMedian.TabIndex = 11;
+            calculateSumNMedian.Text = "Calculate sum of even numbers and median for float numbers from \"Files\" table";
+            calculateSumNMedian.UseVisualStyleBackColor = true;
+            calculateSumNMedian.Click += calculateSumNMedian_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(964, 515);
+            Controls.Add(calculateSumNMedian);
+            Controls.Add(calculationResultTextBox);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Name = "Form1";
@@ -159,6 +184,7 @@
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -173,5 +199,7 @@
         private GroupBox groupBox2;
         private TextBox databaseTransferedInfoTextBox;
         private Button databaseTransferButton;
+        private TextBox calculationResultTextBox;
+        private Button calculateSumNMedian;
     }
 }
